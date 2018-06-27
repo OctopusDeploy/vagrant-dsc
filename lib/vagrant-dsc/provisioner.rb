@@ -138,17 +138,17 @@ module VagrantPlugins
 
       def get_guest_powershell_version
         version = @machine.communicate.shell.powershell("$PSVersionTable.PSVersion.Major")
-        return version[:data][0][:stdout]
+        return version.stdout
       end
 
       def get_lcm_state
         state = @machine.communicate.shell.powershell("(Get-DscLocalConfigurationManager).LCMState")
-        return state[:data][0][:stdout]
+        return state.stdout
       end
 
       def get_configuration_status
         status = @machine.communicate.shell.powershell("(Get-DscConfigurationStatus).Status")
-        return status[:data][0][:stdout]
+        return status.stdout
       end
 
       def show_dsc_failure_message
