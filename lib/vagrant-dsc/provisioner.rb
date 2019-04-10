@@ -102,10 +102,10 @@ module VagrantPlugins
           run_dsc_apply
         rescue VagrantPlugins::CommunicatorWinRM::Errors::AuthenticationFailed
           # when install set a domain controller windows kills the active connection with a AuthenticationFailed.
-          # The DSC job is still running and new connections are possible, so try to wait 
+          # The DSC job is still running and new connections are possible, so try to wait
           @machine.ui.info(I18n.t("vagrant_dsc.errors.winrm_authorization_error_recover"))
         end
-        
+
         wait_for_dsc_completion
       end
 
@@ -218,7 +218,7 @@ module VagrantPlugins
             config: @config,
             module_paths: @module_paths.map { |k,v| v }.join(";"),
             mof_path: @config.mof_path,
-            configuration_file: @config.configuration_file,
+            configuration_file: File.basename(@config.configuration_file),
             configuration_file_path: "#{@config.manifests_path}/#{File.basename @config.configuration_file}",
             configuration_data_file_path: @config.configuration_data_file,
             configuration_name: @config.configuration_name,

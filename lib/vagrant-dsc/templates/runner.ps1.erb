@@ -29,26 +29,49 @@ if ((Get-PSRepository -Name PSGallery).InstallationPolicy -ne "Trusted") {
 "<%= options[:module_install] %>".Split(";") | foreach { Install-Module $_ }
 <% end %>
 
-$script = $(Join-Path "<%= options[:temp_path] %>" "<%= options[:configuration_file_path] %>" -Resolve)
+$manifestPath = Join-Path "<%= options[:temp_path] %>" "<%= options[:manifests_path] %>"
+$script = $(Join-Path $manifestPath "<%= options[:configuration_file] %>" -Resolve -ErrorAction SilentlyContinue)
+if ($null -eq $script) {
+    $nestedManifestPath = $manifestPath + "/" + (Get-Item $manifestPath).name
+    $script = $(Join-Path $nestedManifestPath "<%= options[:configuration_file] %>" -Resolve -ErrorAction SilentlyContinue)
+    if ($null -eq $script) {
+        Write-Host "Couldn't find file '<%= options[:configuration_file] %>'. Looked in:"
+        Write-Host " - $manifestPath"
+        Write-Host " - $nestedManifestPath"
+        exit 1
+    }
+}
+
 echo "PSModulePath Configured: ${env:PSModulePath}"
 echo ""
 echo "Running Configuration file: ${script}"
 
 # Generate the MOF file, only if a MOF path not already provided.
 <% if options[:mof_path] == nil %>
-# Import the Manifest
+Write-Host "Importing manifest '$script'"
 . $script
 
-cd "<%= options[:temp_path] %>"
+push-location "<%= options[:temp_path] %>"
 $StagingPath = $(Join-Path "<%= options[:temp_path] %>" "staging")
 <% if options[:configuration_data_file_path] != nil %>
-$Config = $(iex (Get-Content (Join-Path "<%= options[:temp_path] %>" "<%= options[:configuration_data_file_path] %>" -Resolve) | Out-String))
+$configDataFilePath = Join-Path "<%= options[:temp_path] %>" <%= options[:configuration_data_file_path] %>
+if (-not (Test-Path $configDataFilePath)) {
+    $manifestPath = (Join-Path "<%= options[:temp_path] %>" "<%= options[:manifests_path] %>" -Resolve)
+    $configDataFilePath = Join-Path "<%= options[:temp_path] %>" ("<%= options[:configuration_data_file_path] %>"" -replace "<%= options[:manifests_path] %>", ("<%= options[:manifests_path] %>" + "/" + (Get-Item $manifestPath).name + "/"))
+}
+Write-host "Reading config from '$configDataFilePath'"
+$Config = $(iex (Get-Content $configDataFilePath | Out-String))
+
 <% end %>
 <%=options[:configuration_name]%> -OutputPath $StagingPath <%= options[:parameters] %><% if options[:configuration_data_file_path] != nil %> -ConfigurationData $Config<% end %>
-<% else %> 
+<% else %>
 $StagingPath = "<%= options[:mof_path] %>"
 <% end %>
 
 # Start a DSC Configuration run
 Start-DscConfiguration -Force -Wait -Verbose -Path $StagingPath
-del $StagingPath\*.mof
+if (Test-Path $StagingPath\*.mof) {
+    write-host "Cleaning up mof files in $staging"
+    del $StagingPath\*.mof
+}
+pop-location

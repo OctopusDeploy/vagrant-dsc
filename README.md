@@ -1,8 +1,8 @@
 # Vagrant DSC Plugin
 
-[![Build Status](https://travis-ci.org/mefellows/vagrant-dsc.svg)](https://travis-ci.org/mefellows/vagrant-dsc)
-[![Coverage Status](https://coveralls.io/repos/mefellows/vagrant-dsc/badge.png?branch=master)](https://coveralls.io/r/mefellows/vagrant-dsc?branch=master)
-[![Gem Version](https://badge.fury.io/rb/vagrant-dsc.svg)](http://badge.fury.io/rb/vagrant-dsc)
+This is a fork of [https://github.com/mefellows/vagrant-dsc](vagrant-dsc) by Matt Fellows, with a few tweaks we've needed along the way.
+We'd recommend you use his original work if possible.
+
 
 [Desired State Configuration](https://msdn.microsoft.com/en-us/powershell/dsc/overview) provisioning plugin for Vagrant, enabling you to quickly configure & bootstrap a Windows Virtual Machine in a repeatable, reliable fashion - the Vagrant way.
 
