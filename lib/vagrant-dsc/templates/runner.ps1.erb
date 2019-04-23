@@ -57,7 +57,7 @@ $StagingPath = $(Join-Path "<%= options[:temp_path] %>" "staging")
 $configDataFilePath = Join-Path "<%= options[:temp_path] %>" <%= options[:configuration_data_file_path] %>
 if (-not (Test-Path $configDataFilePath)) {
     $manifestPath = (Join-Path "<%= options[:temp_path] %>" "<%= options[:manifests_path] %>" -Resolve)
-    $configDataFilePath = Join-Path "<%= options[:temp_path] %>" ("<%= options[:configuration_data_file_path] %>"" -replace "<%= options[:manifests_path] %>", ("<%= options[:manifests_path] %>" + "/" + (Get-Item $manifestPath).name + "/"))
+    $configDataFilePath = Join-Path "<%= options[:temp_path] %>" ("<%= options[:configuration_data_file_path] %>" -replace "<%= options[:manifests_path] %>", ("<%= options[:manifests_path] %>" + "/" + (Get-Item $manifestPath).name + "/"))
 }
 Write-host "Reading config from '$configDataFilePath'"
 $Config = $(iex (Get-Content $configDataFilePath | Out-String))
