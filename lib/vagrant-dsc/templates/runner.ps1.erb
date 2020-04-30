@@ -6,6 +6,8 @@
 #
 #
 
+[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls11 -bor [System.Net.SecurityProtocolType]::Tls12
+
 # Set the local PowerShell Module environment path
 <% if !options[:module_paths].empty?  %>
 $absoluteModulePaths = [string]::Join(";", ("<%= options[:module_paths] %>".Split(";") | ForEach-Object { $_ | Resolve-Path }))
